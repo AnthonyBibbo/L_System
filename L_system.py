@@ -23,7 +23,7 @@ G.rule("G", "F-G")
 variables = [ F, G ]
 axiom = "F"
 sequence = axiom
-n = 10
+n = 14
 x = 700
 y = 340
 delay = 2
@@ -74,24 +74,10 @@ for i in range(n-1):
 
 print(sequence)
 
-
 pygame.init()
 screen = pygame.display.set_mode((1440, 900))
 screen.fill((255, 255, 255))  # White background
 
-# ==== Cellular Automaton Setup (Rule 90) ====
-def next_gen(cells):
-    return [cells[i-1] ^ cells[i+1] if 0 < i < len(cells)-1 else 0 for i in range(len(cells))]
-
-ca_width = 128
-cell_size = 6
-ca_cells = [0] * ca_width
-ca_cells[ca_width // 2] = 1
-ca_gens = [ca_cells[:]]  # Save generations
-
-for _ in range(80):
-    ca_cells = next_gen(ca_cells)
-    ca_gens.append(ca_cells[:])
 
 # ==== Animation Loop ====
 clock = pygame.time.Clock()
@@ -105,111 +91,69 @@ stack = []
 
 #starting position in the middle 
 #x,y
-
-for char in sequence:
-    if char == "F" or char == "G":
-        #draw current direction
-        if direction == "up":
-            y2 = y-distance
-            pygame.draw.line(screen, (0, 0, 255), (x,y), (x, y2), 1)
-            y = y2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-        elif direction == "left":
-            x2 = x - distance
-            pygame.draw.line(screen, (0, 0, 255), (x,y), (x2, y), 1)
-            x = x2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-        elif direction == "down":
-            y2 = y + distance
-            pygame.draw.line(screen, (0, 0, 255), (x,y), (x, y2), 1)
-            y = y2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-        elif direction == "right":
-            x2 = x + distance
-            pygame.draw.line(screen, (0,0,255), (x,y), (x2, y), 1)
-            x = x2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-    elif char == "+":
-        #update orientation
-        if direction == "up":
-            direction = "left"
-        elif direction == "left":
-            direction = "down"
-        elif direction == "down":
-            direction = "right"
+def draw_l_sys(x, y, sequence, direction, color):
+    for char in sequence:
+        if char == "F" or char == "G":
+            #draw current direction
+            if direction == "up":
+                y2 = y-distance
+                pygame.draw.line(screen, color, (x,y), (x, y2), 1)
+                y = y2
+                pygame.display.flip()
+                pygame.time.delay(delay)
+            elif direction == "left":
+                x2 = x - distance
+                pygame.draw.line(screen, color, (x,y), (x2, y), 1)
+                x = x2
+                pygame.display.flip()
+                pygame.time.delay(delay)
+            elif direction == "down":
+                y2 = y + distance
+                pygame.draw.line(screen, color, (x,y), (x, y2), 1)
+                y = y2
+                pygame.display.flip()
+                pygame.time.delay(delay)
+            elif direction == "right":
+                x2 = x + distance
+                pygame.draw.line(screen, color, (x,y), (x2, y), 1)
+                x = x2
+                pygame.display.flip()
+                pygame.time.delay(delay)
+        elif char == "+":
+            #update orientation
+            if direction == "up":
+                direction = "left"
+            elif direction == "left":
+                direction = "down"
+            elif direction == "down":
+                direction = "right"
+            else:
+                direction = "up"
         else:
-            direction = "up"
-    else:
-        if direction == "up":
-            direction = "right"
-        elif direction == "right":
-            direction = "down"
-        elif direction == "down":
-            direction = "left"
-        else:
-            direction = "up"
+            if direction == "up":
+                direction = "right"
+            elif direction == "right":
+                direction = "down"
+            elif direction == "down":
+                direction = "left"
+            else:
+                direction = "up"
 
-# Draw CA at the bottom
-for row, gen in enumerate(ca_gens):
-    for col, cell in enumerate(gen):
-        color = (0, 0, 0) if cell else (255, 255, 255)
-        pygame.draw.rect(screen, color, (col * cell_size, row * cell_size, cell_size, cell_size))
-    pygame.display.flip()
-    pygame.time.delay(30)
+draw_l_sys(x, y, sequence, direction, (0,0,255))
 
 # Reset for L-system drawing
 x, y = 512, 500
-angle = 90
-for char in sequence:
-    if char == "F" or char == "G":
-        #draw current direction
-        if direction == "up":
-            y2 = y-distance
-            pygame.draw.line(screen, (0, 0, 255), (x,y), (x, y2), 1)
-            y = y2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-        elif direction == "left":
-            x2 = x - distance
-            pygame.draw.line(screen, (0, 0, 255), (x,y), (x2, y), 1)
-            x = x2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-        elif direction == "down":
-            y2 = y + distance
-            pygame.draw.line(screen, (0, 0, 255), (x,y), (x, y2), 1)
-            y = y2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-        elif direction == "right":
-            x2 = x + distance
-            pygame.draw.line(screen, (0,0,255), (x,y), (x2, y), 1)
-            x = x2
-            pygame.display.flip()
-            pygame.time.delay(delay)
-    elif char == "+":
-        #update orientation
-        if direction == "up":
-            direction = "left"
-        elif direction == "left":
-            direction = "down"
-        elif direction == "down":
-            direction = "right"
-        else:
-            direction = "up"
-    else:
-        if direction == "up":
-            direction = "right"
-        elif direction == "right":
-            direction = "down"
-        elif direction == "down":
-            direction = "left"
-        else:
-            direction = "up"
+direction = "up"
+draw_l_sys(x, y, sequence, direction, (255,0,0))
+
+x, y = 512, 500
+direction = "down"
+draw_l_sys(x, y, sequence, direction, (0,255,0))
+
+x, y = 512, 500
+direction = "left"
+draw_l_sys(x, y, sequence, direction, (255,255,0))
+
 
 pygame.time.wait(3000)  # Display for 3 seconds
 pygame.quit()
